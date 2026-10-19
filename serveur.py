@@ -265,7 +265,7 @@ def _maj(texte):
     texte = (texte or "").strip()
     if not texte:
         return texte
-    texte = texte.replace("vpn", "VPN") if "vpn" in texte else texte
+    texte = re.sub(r"\bvpn\b", "VPN", texte, flags=re.IGNORECASE)
     return texte[:1].upper() + texte[1:]
 
 
