@@ -258,8 +258,14 @@ def _compteur():
 
 
 def _image(slug, variante=0):
-    """Une illustration stable pour un article : le même slug rend toujours la même image."""
-    n = (sum(ord(c) for c in (slug or "")) + variante) % 5 + 1
+    """Une illustration stable pour un article : le même slug rend toujours la même image.
+
+    ⛔ La somme des codes de caractères donnait des collisions (deux articles de la une avec la
+    MÊME photo). Un vrai condensé disperse correctement.
+    """
+    import hashlib
+    empreinte = int(hashlib.md5((slug or "").encode()).hexdigest()[:8], 16)
+    n = (empreinte + variante) % 8 + 1
     return f"/img/p{n}.jpg"
 
 
@@ -300,7 +306,7 @@ def _page(titre, contenu, actif, titre_onglet=None, description=None):
 <style>{STYLE}</style></head><body>
 <header class="site"><div class="wrap">
 <a class="marque" href="/">Guide<span>VPN</span></a>
-<nav><a href="/guides/">Les guides</a></nav>
+<nav><a href="/">Accueil</a><a href="/guides/">Tous les guides</a></nav>
 </div></header>
 <main class="wrap">{contenu}</main>
 <footer class="pied"><div class="wrap">
@@ -397,7 +403,7 @@ def page_article(slug):
         for s, x in autres)
     corps = (
         f'<div class="article">'
-        f'<p class="fil"><a href="/">Les guides</a> › {html.escape(titre)}</p>'
+        f'<p class="fil"><a href="/">Accueil</a> › <a href="/guides/">Guides</a> › {html.escape(titre)}</p>'
         f'<h1>{html.escape(_maj(a["h1"]))}</h1>'
         f'<p class="chapeau">{html.escape(a["chapeau"])}</p>'
         f'<div class="entete-meta"><img src="/img/auteur.jpg" alt="José Ledanite" width="34" height="34">'
