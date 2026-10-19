@@ -120,6 +120,34 @@ footer.pied{margin-top:50px;border-top:1px solid var(--line);padding:28px 0 42px
 footer.pied .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer.pied a{color:var(--muted)}
 
+
+/* ── couverture 3D du livre blanc ──────────────────────── */
+.ebook{perspective:1100px;display:flex;justify-content:center;margin:14px 0 30px}
+.ebook .livre{position:relative;width:212px;height:292px;padding:22px 18px 18px;
+  transform:rotateY(-21deg) rotateX(4deg);transform-style:preserve-3d;
+  background:linear-gradient(135deg,#0f2b46 0%,#1e5f8a 52%,#0b1f33 100%);
+  color:#fff;border-radius:3px 8px 8px 3px;
+  box-shadow:26px 24px 44px -18px rgba(10,25,40,.55), 0 2px 0 rgba(255,255,255,.15) inset;
+  display:flex;flex-direction:column;justify-content:space-between}
+.ebook .livre::before{content:"";position:absolute;left:0;top:0;bottom:0;width:15px;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(255,255,255,.14));border-radius:3px 0 0 3px}
+.ebook .livre::after{content:"";position:absolute;right:-7px;top:4px;bottom:4px;width:7px;
+  background:linear-gradient(90deg,#e8eef5,#c9d3de);transform:rotateY(90deg);transform-origin:left}
+.ebook .haut small{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+.ebook .haut h3{font-family:Georgia,serif;font-size:24px;line-height:1.14;margin:10px 0 0;letter-spacing:-.02em}
+.ebook .bas{font-size:11.5px;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:9px}
+.ebook .badge-3d{position:absolute;top:10px;right:10px}
+
+/* ── formulaire de capture ─────────────────────────────── */
+.capture{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.capture input[type=email]{flex:1 1 220px;padding:13px 15px;border:1px solid var(--line);
+  border-radius:10px;font:inherit;background:#fff}
+.capture input[type=email]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.capture button{flex:0 0 auto;padding:13px 20px;border:0;border-radius:10px;cursor:pointer;
+  background:var(--ink);color:#fff;font:inherit;font-weight:600}
+.capture button:hover{background:#000}
+.capture-note{font-size:12.5px;color:var(--muted);margin:0 0 22px}
+
 @media (max-width:520px){
   .carte{gap:14px}
   .carte .vignette{flex-basis:96px;height:80px}
@@ -417,6 +445,7 @@ def page_article(slug):
         f'<div><b>📘 Le guide VPN 2026 — gratuit</b>'
         f'<p>Six sections pour choisir, installer et ne pas se faire avoir. '
         f'<a href="/livre-blanc/"><b>Recevoir le guide</b></a> — par email, sans spam.</p></div></div>'
+        f'{FORMULAIRE}'
         f'<div class="encart"><img src="/img/auteur.jpg" alt="José Ledanite" width="56" height="56">'
         f'<div><b>Cet article t’a été utile ?</b><p>Je publie un guide par jour sur les VPN, '
         f'le streaming et le foot en ligne. Le plus simple : garde le site en favori.</p></div></div>'
@@ -492,6 +521,31 @@ aucun VPN ne peut promettre. Un essai de 30 jours est donc plus utile que n'impo
 """
 
 
+# ⛔ LE FORMULAIRE DE CAPTURE. Pas de compte, pas de service tiers : il poste vers FormSubmit,
+# qui relaie chaque inscription par email dans la boîte de José. Pépite lit ensuite cette boîte
+# (IMAP) et envoie la séquence. C'est le seul chemin qui ne demande AUCUNE vérification.
+FORMULAIRE = """
+<form class="capture" action="https://formsubmit.co/chrismotivation21@gmail.com" method="POST">
+  <input type="hidden" name="_subject" value="Nouvelle inscription — Guide VPN">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_next" value="https://jos626.github.io/livre-blanc/merci/">
+  <input type="email" name="email" required placeholder="ton@email.com" aria-label="Ton adresse email">
+  <button type="submit">Recevoir le guide</button>
+</form>
+<p class="capture-note">Le guide arrive tout de suite. Ensuite, un email utile de temps en temps —
+jamais de spam, désinscription en un clic.</p>
+"""
+
+COUVERTURE = """
+<div class="ebook"><div class="livre">
+  <div class="haut"><small>Livre blanc · édition 2026</small>
+    <h3>Le guide VPN 2026</h3></div>
+  <div class="bas">Choisir · Installer · Ne pas se faire avoir<br>José Ledanite</div>
+</div></div>
+"""
+
+
 def page_livre_blanc():
     """Le livre blanc : une page qu'on peut lire en ligne et imprimer en PDF (Ctrl+P)."""
     corps = ('<div class="article" style="margin-top:26px">'
@@ -499,6 +553,7 @@ def page_livre_blanc():
              '<h1>Le guide VPN 2026</h1>'
              '<p class="chapeau">Choisir, installer, ne pas se faire avoir : ce que les comparatifs '
              'ne disent pas, en six sections.</p>'
+             + COUVERTURE + FORMULAIRE +
              '<div class="entete-meta"><img src="/img/auteur.jpg" alt="José Ledanite" width="34" height="34">'
              '<span><b>José Ledanite</b> · édition 2026 · 9 min de lecture</span></div>'
              + LIVRE_BLANC +
@@ -514,6 +569,16 @@ def page_livre_blanc():
                  titre_onglet="Le guide VPN 2026 — livre blanc gratuit",
                  description="Gratuit ou payant, installation sur TV Android, vitesse, streaming, prix "
                              "réel : le guide complet en six sections, par José Ledanite.")
+
+
+def page_merci():
+    corps = ('<div class="article" style="margin-top:40px;text-align:left">'
+             '<h1>C\'est envoyé.</h1>'
+             '<p class="chapeau">Le guide part dans ta boîte dans la minute. S\'il n\'arrive pas, '
+             'regarde dans les spams et marque-le comme « non spam » — c\'est le premier email, '
+             'les suivants passeront ensuite.</p>'
+             '<p><a href="/guides/"><b>Lire les guides en attendant →</b></a></p></div>')
+    return _page("C'est envoyé", corps, "guides", titre_onglet="Guide envoyé — Guide VPN")
 
 
 def sitemap():
@@ -602,6 +667,9 @@ def fabriquer_serveur(port=8080):
             # ── LES GUIDES (le contenu qui se référence). José, 10/10/2026 : « on va passer au SEO
             # de pari foot ». Sans ces pages, il n'y a rien à référencer : une application sans
             # texte ne se classe pas sur Google.
+            if chemin in ("/livre-blanc/merci", "/livre-blanc/merci/"):
+                self._envoyer(page_merci(), "text/html; charset=utf-8")
+                return
             if chemin == "/livre-blanc":
                 self._envoyer(page_livre_blanc(), "text/html; charset=utf-8")
                 return

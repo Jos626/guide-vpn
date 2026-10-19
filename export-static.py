@@ -81,7 +81,8 @@ def main(domaine):
                             articles.append(json.load(fh).get("slug"))
 
         pages = [("", "index.html"), ("/guides", "guides/index.html"),
-                 ("/livre-blanc", "livre-blanc/index.html")]
+                 ("/livre-blanc", "livre-blanc/index.html"),
+                 ("/livre-blanc/merci", "livre-blanc/merci/index.html")]
         for slug in articles:
             if slug:
                 pages.append((f"/guides/{slug}", f"guides/{slug}/index.html"))

@@ -100,6 +100,34 @@ footer.pied{margin-top:50px;border-top:1px solid var(--line);padding:28px 0 42px
 footer.pied .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer.pied a{color:var(--muted)}
 
+
+/* ── couverture 3D du livre blanc ──────────────────────── */
+.ebook{perspective:1100px;display:flex;justify-content:center;margin:14px 0 30px}
+.ebook .livre{position:relative;width:212px;height:292px;padding:22px 18px 18px;
+  transform:rotateY(-21deg) rotateX(4deg);transform-style:preserve-3d;
+  background:linear-gradient(135deg,#0f2b46 0%,#1e5f8a 52%,#0b1f33 100%);
+  color:#fff;border-radius:3px 8px 8px 3px;
+  box-shadow:26px 24px 44px -18px rgba(10,25,40,.55), 0 2px 0 rgba(255,255,255,.15) inset;
+  display:flex;flex-direction:column;justify-content:space-between}
+.ebook .livre::before{content:"";position:absolute;left:0;top:0;bottom:0;width:15px;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(255,255,255,.14));border-radius:3px 0 0 3px}
+.ebook .livre::after{content:"";position:absolute;right:-7px;top:4px;bottom:4px;width:7px;
+  background:linear-gradient(90deg,#e8eef5,#c9d3de);transform:rotateY(90deg);transform-origin:left}
+.ebook .haut small{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+.ebook .haut h3{font-family:Georgia,serif;font-size:24px;line-height:1.14;margin:10px 0 0;letter-spacing:-.02em}
+.ebook .bas{font-size:11.5px;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:9px}
+.ebook .badge-3d{position:absolute;top:10px;right:10px}
+
+/* ── formulaire de capture ─────────────────────────────── */
+.capture{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.capture input[type=email]{flex:1 1 220px;padding:13px 15px;border:1px solid var(--line);
+  border-radius:10px;font:inherit;background:#fff}
+.capture input[type=email]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.capture button{flex:0 0 auto;padding:13px 20px;border:0;border-radius:10px;cursor:pointer;
+  background:var(--ink);color:#fff;font:inherit;font-weight:600}
+.capture button:hover{background:#000}
+.capture-note{font-size:12.5px;color:var(--muted);margin:0 0 22px}
+
 @media (max-width:520px){
   .carte{gap:14px}
   .carte .vignette{flex-basis:96px;height:80px}

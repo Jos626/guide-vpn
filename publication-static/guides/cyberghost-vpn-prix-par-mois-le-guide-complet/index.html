@@ -100,6 +100,34 @@ footer.pied{margin-top:50px;border-top:1px solid var(--line);padding:28px 0 42px
 footer.pied .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer.pied a{color:var(--muted)}
 
+
+/* ── couverture 3D du livre blanc ──────────────────────── */
+.ebook{perspective:1100px;display:flex;justify-content:center;margin:14px 0 30px}
+.ebook .livre{position:relative;width:212px;height:292px;padding:22px 18px 18px;
+  transform:rotateY(-21deg) rotateX(4deg);transform-style:preserve-3d;
+  background:linear-gradient(135deg,#0f2b46 0%,#1e5f8a 52%,#0b1f33 100%);
+  color:#fff;border-radius:3px 8px 8px 3px;
+  box-shadow:26px 24px 44px -18px rgba(10,25,40,.55), 0 2px 0 rgba(255,255,255,.15) inset;
+  display:flex;flex-direction:column;justify-content:space-between}
+.ebook .livre::before{content:"";position:absolute;left:0;top:0;bottom:0;width:15px;
+  background:linear-gradient(90deg,rgba(0,0,0,.5),rgba(255,255,255,.14));border-radius:3px 0 0 3px}
+.ebook .livre::after{content:"";position:absolute;right:-7px;top:4px;bottom:4px;width:7px;
+  background:linear-gradient(90deg,#e8eef5,#c9d3de);transform:rotateY(90deg);transform-origin:left}
+.ebook .haut small{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.8}
+.ebook .haut h3{font-family:Georgia,serif;font-size:24px;line-height:1.14;margin:10px 0 0;letter-spacing:-.02em}
+.ebook .bas{font-size:11.5px;opacity:.85;border-top:1px solid rgba(255,255,255,.25);padding-top:9px}
+.ebook .badge-3d{position:absolute;top:10px;right:10px}
+
+/* ── formulaire de capture ─────────────────────────────── */
+.capture{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.capture input[type=email]{flex:1 1 220px;padding:13px 15px;border:1px solid var(--line);
+  border-radius:10px;font:inherit;background:#fff}
+.capture input[type=email]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.capture button{flex:0 0 auto;padding:13px 20px;border:0;border-radius:10px;cursor:pointer;
+  background:var(--ink);color:#fff;font:inherit;font-weight:600}
+.capture button:hover{background:#000}
+.capture-note{font-size:12.5px;color:var(--muted);margin:0 0 22px}
+
 @media (max-width:520px){
   .carte{gap:14px}
   .carte .vignette{flex-basis:96px;height:80px}
@@ -205,7 +233,18 @@ footer.pied a{color:var(--muted)}
 </ul>
 
 <h2>Conclusion</h2>
-<p>CyberGhost VPN propose une tarification claire, des fonctionnalités robustes et une bonne flexibilité grâce à son abonnement mensuel. Le prix mensuel est plus élevé que la moyenne annuelle, mais il convient aux utilisateurs qui recherchent une solution sans engagement. Comparez les options avec d’autres fournisseurs comme <a href="https://nordvpn.com/" rel="nofollow sponsored">NordVPN</a> pour vous assurer de choisir le meilleur rapport qualité‑prix selon vos besoins.</p><div class="encart" style="border-color:#d9a900;background:#fffaf0"><img src="/img/auteur.jpg" alt="" width="56" height="56"><div><b>📘 Le guide VPN 2026 — gratuit</b><p>Six sections pour choisir, installer et ne pas se faire avoir. <a href="/livre-blanc/"><b>Recevoir le guide</b></a> — par email, sans spam.</p></div></div><div class="encart"><img src="/img/auteur.jpg" alt="José Ledanite" width="56" height="56"><div><b>Cet article t’a été utile ?</b><p>Je publie un guide par jour sur les VPN, le streaming et le foot en ligne. Le plus simple : garde le site en favori.</p></div></div><div class="partage"><span>Partager</span><a href="https://wa.me/?text=Cyberghost%20vpn%20prix%20par%20mois%20%E2%80%94%20le%20guide%20complet%20https%3A//jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/" rel="nofollow">WhatsApp</a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A//jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/" rel="nofollow">Facebook</a><a href="https://twitter.com/intent/tweet?text=Cyberghost%20vpn%20prix%20par%20mois%20%E2%80%94%20le%20guide%20complet&url=https%3A//jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/" rel="nofollow">X</a><button type="button" onclick="navigator.clipboard.writeText('https://jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/');this.textContent='Lien copié'">Copier le lien</button></div></div><div class="titre-section"><h2>À lire ensuite</h2><i></i></div><div class="liste"><a class="carte" href="/guides/meilleur-vpn-pour-la-chine-le-guide-complet-2026/"><div class="vignette"><img src="/img/p1.jpg" alt="" loading="lazy" width="264" height="192"></div><div><h3>Meilleur VPN pour la chine — le guide complet 2026</h3><span class="meta">6 min de lecture</span></div></a><a class="carte" href="/guides/meilleur-vpn-pour-tv-android-le-guide-complet-2024/"><div class="vignette"><img src="/img/p7.jpg" alt="" loading="lazy" width="264" height="192"></div><div><h3>Meilleur VPN pour tv android — le guide complet 2024</h3><span class="meta">5 min de lecture</span></div></a></div></main>
+<p>CyberGhost VPN propose une tarification claire, des fonctionnalités robustes et une bonne flexibilité grâce à son abonnement mensuel. Le prix mensuel est plus élevé que la moyenne annuelle, mais il convient aux utilisateurs qui recherchent une solution sans engagement. Comparez les options avec d’autres fournisseurs comme <a href="https://nordvpn.com/" rel="nofollow sponsored">NordVPN</a> pour vous assurer de choisir le meilleur rapport qualité‑prix selon vos besoins.</p><div class="encart" style="border-color:#d9a900;background:#fffaf0"><img src="/img/auteur.jpg" alt="" width="56" height="56"><div><b>📘 Le guide VPN 2026 — gratuit</b><p>Six sections pour choisir, installer et ne pas se faire avoir. <a href="/livre-blanc/"><b>Recevoir le guide</b></a> — par email, sans spam.</p></div></div>
+<form class="capture" action="https://formsubmit.co/chrismotivation21@gmail.com" method="POST">
+  <input type="hidden" name="_subject" value="Nouvelle inscription — Guide VPN">
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="_next" value="https://jos626.github.io/livre-blanc/merci/">
+  <input type="email" name="email" required placeholder="ton@email.com" aria-label="Ton adresse email">
+  <button type="submit">Recevoir le guide</button>
+</form>
+<p class="capture-note">Le guide arrive tout de suite. Ensuite, un email utile de temps en temps —
+jamais de spam, désinscription en un clic.</p>
+<div class="encart"><img src="/img/auteur.jpg" alt="José Ledanite" width="56" height="56"><div><b>Cet article t’a été utile ?</b><p>Je publie un guide par jour sur les VPN, le streaming et le foot en ligne. Le plus simple : garde le site en favori.</p></div></div><div class="partage"><span>Partager</span><a href="https://wa.me/?text=Cyberghost%20vpn%20prix%20par%20mois%20%E2%80%94%20le%20guide%20complet%20https%3A//jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/" rel="nofollow">WhatsApp</a><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A//jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/" rel="nofollow">Facebook</a><a href="https://twitter.com/intent/tweet?text=Cyberghost%20vpn%20prix%20par%20mois%20%E2%80%94%20le%20guide%20complet&url=https%3A//jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/" rel="nofollow">X</a><button type="button" onclick="navigator.clipboard.writeText('https://jos626.github.io/guides/cyberghost-vpn-prix-par-mois-le-guide-complet/');this.textContent='Lien copié'">Copier le lien</button></div></div><div class="titre-section"><h2>À lire ensuite</h2><i></i></div><div class="liste"><a class="carte" href="/guides/meilleur-vpn-pour-la-chine-le-guide-complet-2026/"><div class="vignette"><img src="/img/p1.jpg" alt="" loading="lazy" width="264" height="192"></div><div><h3>Meilleur VPN pour la chine — le guide complet 2026</h3><span class="meta">6 min de lecture</span></div></a><a class="carte" href="/guides/meilleur-vpn-pour-tv-android-le-guide-complet-2024/"><div class="vignette"><img src="/img/p7.jpg" alt="" loading="lazy" width="264" height="192"></div><div><h3>Meilleur VPN pour tv android — le guide complet 2024</h3><span class="meta">5 min de lecture</span></div></a></div></main>
 <footer class="pied"><div class="wrap">
 <p><b>Guide VPN</b> — des comparatifs honnêtes : ce qui marche, ce qui ne marche pas, et pourquoi.</p>
 <p>Écrit par José Ledanite · <a href="/sitemap.xml">Plan du site</a></p>
