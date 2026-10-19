@@ -80,7 +80,8 @@ def main(domaine):
                         with open(os.path.join(dossier_articles, f), encoding="utf-8") as fh:
                             articles.append(json.load(fh).get("slug"))
 
-        pages = [("", "index.html"), ("/guides", "guides/index.html")]
+        pages = [("", "index.html"), ("/guides", "guides/index.html"),
+                 ("/livre-blanc", "livre-blanc/index.html")]
         for slug in articles:
             if slug:
                 pages.append((f"/guides/{slug}", f"guides/{slug}/index.html"))

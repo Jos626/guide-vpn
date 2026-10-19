@@ -412,6 +412,11 @@ def page_article(slug):
         f'<div class="hero"><img src="{_image(slug)}" alt="{html.escape(titre)}" '
         f'width="1200" height="675"></div>'
         f'{a["corps"]}'
+        f'<div class="encart" style="border-color:#d9a900;background:#fffaf0">'
+        f'<img src="/img/auteur.jpg" alt="" width="56" height="56">'
+        f'<div><b>📘 Le guide VPN 2026 — gratuit</b>'
+        f'<p>Six sections pour choisir, installer et ne pas se faire avoir. '
+        f'<a href="/livre-blanc/"><b>Recevoir le guide</b></a> — par email, sans spam.</p></div></div>'
         f'<div class="encart"><img src="/img/auteur.jpg" alt="José Ledanite" width="56" height="56">'
         f'<div><b>Cet article t’a été utile ?</b><p>Je publie un guide par jour sur les VPN, '
         f'le streaming et le foot en ligne. Le plus simple : garde le site en favori.</p></div></div>'
@@ -424,11 +429,98 @@ def page_article(slug):
     return _page(a["h1"], corps, "guides", titre_onglet=titre, description=a["description"])
 
 
+LIVRE_BLANC = """
+<h2>1. Gratuit ou payant : le vrai calcul</h2>
+<p>Un VPN gratuit n'est pas un VPN moins cher : c'est un VPN payé autrement. Trois modèles existent,
+et un seul est honnête.</p>
+<ul>
+<li><b>La version bridée</b> — 2 Go par mois, trois serveurs, une seule connexion. Suffisant pour
+essayer, insuffisant pour regarder une chaîne en continu : une heure de streaming consomme 1 à 3 Go.</li>
+<li><b>La revente de données</b> — le service se finance en observant ce que tu fais. C'est le modèle
+économique, pas un accident.</li>
+<li><b>Le faux VPN</b> — l'application affiche « connecté » et ne chiffre rien. Le test : coupe le
+Wi-Fi, garde la 4G, et vérifie que ton adresse IP publique change réellement.</li>
+</ul>
+<p>Un abonnement correct coûte entre 2 et 4 euros par mois sur deux ans. C'est le prix d'un café par
+mois — et c'est ce qui permet au service de ne pas vendre tes données.</p>
+
+<h2>2. Installer sur une TV Android</h2>
+<p>Trois chemins, du plus simple au plus manuel :</p>
+<ul>
+<li><b>Play Store présent</b> — installation directe, cinq minutes, c'est réglé.</li>
+<li><b>Play Store absent</b> — télécharge l'APK sur le site officiel de l'éditeur, jamais sur un dépôt
+tiers. Autorise l'installation depuis une source inconnue, installe, puis <b>désactive à nouveau</b>
+cette autorisation.</li>
+<li><b>TV sans Android</b> — le VPN se met sur le routeur, ou sur le partage de connexion du téléphone.
+Toute la maison passe alors par le tunnel.</li>
+</ul>
+
+<h2>3. Pourquoi ça rame (ce n'est presque jamais le VPN)</h2>
+<p>Trois causes, dans l'ordre de fréquence :</p>
+<ul>
+<li><b>Le serveur est trop loin</b> — prends le pays le plus proche qui débloque le service visé,
+pas celui qui a le plus joli drapeau.</li>
+<li><b>Le protocole</b> — WireGuard (ou NordLynx) bat OpenVPN sur une connexion mobile. C'est un
+réglage, pas un changement d'abonnement.</li>
+<li><b>Le Wi-Fi lui-même</b> — teste en 4G avant d'accuser le VPN. Sur une connexion à 2 Mb/s, aucun
+VPN ne fera de miracle.</li>
+</ul>
+
+<h2>4. Streaming et sport : ce qui marche vraiment</h2>
+<p>La réponse honnête : ça dépend du service, et ça change. Ce qui fonctionne le plus souvent :
+un serveur dans le pays d'origine du compte, un protocole rapide, et surtout pas de changement de
+pays toutes les cinq minutes — les plateformes repèrent les allers-retours.</p>
+<p>Ce qui ne fonctionne pas : les services qui bloquent les plages d'adresses des hébergeurs. Là,
+aucun VPN ne peut promettre. Un essai de 30 jours est donc plus utile que n'importe quel comparatif.</p>
+
+<h2>5. Le prix réel sur un an</h2>
+<p>Trois lignes à regarder avant de payer :</p>
+<ul>
+<li>le prix <b>au mois sur la durée totale</b>, pas la première année ;</li>
+<li>le <b>renouvellement</b>, souvent au tarif plein ;</li>
+<li>la <b>garantie de remboursement</b> — 30 jours changent tout si le service ne débloque rien.</li>
+</ul>
+
+<h2>6. La seule question qui décide de tout</h2>
+<p>« Qu'est-ce que je veux débloquer, exactement ? »</p>
+<ul>
+<li>La TV d'un pays précis → il faut un serveur dans ce pays.</li>
+<li>La sécurité sur un Wi-Fi public → n'importe quel serveur proche suffit.</li>
+<li>Le sport en streaming → la vitesse et la stabilité comptent plus que le nombre de serveurs.</li>
+</ul>
+<p>Réponds à cette question et tu n'as plus besoin de comparatif.</p>
+"""
+
+
+def page_livre_blanc():
+    """Le livre blanc : une page qu'on peut lire en ligne et imprimer en PDF (Ctrl+P)."""
+    corps = ('<div class="article" style="margin-top:26px">'
+             '<p class="fil"><a href="/">Accueil</a> › Livre blanc</p>'
+             '<h1>Le guide VPN 2026</h1>'
+             '<p class="chapeau">Choisir, installer, ne pas se faire avoir : ce que les comparatifs '
+             'ne disent pas, en six sections.</p>'
+             '<div class="entete-meta"><img src="/img/auteur.jpg" alt="José Ledanite" width="34" height="34">'
+             '<span><b>José Ledanite</b> · édition 2026 · 9 min de lecture</span></div>'
+             + LIVRE_BLANC +
+             '<div class="encart"><img src="/img/auteur.jpg" alt="José Ledanite" width="56" height="56">'
+             '<div><b>Tu veux le recevoir par email ?</b>'
+             '<p>Donne ton adresse et je te l\'envoie — puis un guide utile par mois, jamais de spam.</p>'
+             '</div></div>'
+             '<div class="partage"><span>Partager</span>'
+             f'<a href="https://wa.me/?text={urllib.parse.quote("Le guide VPN 2026 — " + _base() + "/livre-blanc")}" rel="nofollow">WhatsApp</a>'
+             f'<a href="https://www.facebook.com/sharer/sharer.php?u={urllib.parse.quote(_base() + "/livre-blanc")}" rel="nofollow">Facebook</a>'
+             '</div></div>')
+    return _page("Le guide VPN 2026", corps, "guides",
+                 titre_onglet="Le guide VPN 2026 — livre blanc gratuit",
+                 description="Gratuit ou payant, installation sur TV Android, vitesse, streaming, prix "
+                             "réel : le guide complet en six sections, par José Ledanite.")
+
+
 def sitemap():
     """LA CARTE DU SITE — indispensable : sans elle, Google met des semaines à trouver les guides.
     Le domaine est celui du déploiement ; si José change d'adresse, cette ligne suit."""
     base = os.environ.get("URL_PUBLIQUE", "https://guide-vpn.onrender.com").rstrip("/")
-    pages = ["/", "/guides/"] + [f"/guides/{s}/" for s in articles.ARTICLES]
+    pages = ["/", "/guides/", "/livre-blanc"] + [f"/guides/{s}/" for s in articles.ARTICLES]
     urls = "".join(f"<url><loc>{base}{p}</loc></url>" for p in pages)
     return ('<?xml version="1.0" encoding="UTF-8"?>'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>")
@@ -510,6 +602,9 @@ def fabriquer_serveur(port=8080):
             # ── LES GUIDES (le contenu qui se référence). José, 10/10/2026 : « on va passer au SEO
             # de pari foot ». Sans ces pages, il n'y a rien à référencer : une application sans
             # texte ne se classe pas sur Google.
+            if chemin == "/livre-blanc":
+                self._envoyer(page_livre_blanc(), "text/html; charset=utf-8")
+                return
             if chemin == "/guides":
                 self._envoyer(page_tous_guides(), "text/html; charset=utf-8")
                 return
