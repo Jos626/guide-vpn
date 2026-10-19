@@ -249,8 +249,8 @@ def _base():
 
 
 def _compteur():
-    """Le script de mesure des visites (GoatCounter), s'il est configuré. Sinon : rien."""
-    code = os.environ.get("GOATCOUNTER_CODE", "").strip()
+    """Le script de mesure des visites (GoatCounter). Le code du compte est celui du site."""
+    code = os.environ.get("GOATCOUNTER_CODE", "guide-vpn").strip()
     if not code:
         return ""
     return (f'\n<script data-goatcounter="https://{code}.goatcounter.com/count" '
