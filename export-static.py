@@ -96,6 +96,19 @@ def main(domaine):
                                 ("/manifeste.json", "manifeste.json")]:
             _ecrire(fichier, _aspirer(port, chemin))
 
+        # Les articles retirés laissent des adresses mortes (partages, favoris). GitHub Pages sert
+        # ce 404 sur toute URL inconnue : on y renvoie vers les guides plutôt qu'un écran d'erreur.
+        _ecrire("404.html", """<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="0; url=/guides/">
+<title>Page introuvable — Guide VPN</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fffdf8;
+color:#161513;font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center;padding:24px}
+a{color:#8a6b00}</style></head><body><div>
+<h1 style="font-family:Georgia,serif;font-size:28px">Cette page n'existe plus</h1>
+<p>Le guide a été retiré. <a href="/guides/">Voir tous les guides</a>.</p>
+</div></body></html>""".encode())
+
         for f in os.listdir(ICI):
             if f.startswith("icone-") and f.endswith(".png"):
                 shutil.copy(os.path.join(ICI, f), os.path.join(SORTIE, f))
