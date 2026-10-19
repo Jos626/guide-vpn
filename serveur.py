@@ -260,6 +260,15 @@ def _temps_lecture(corps):
     return max(3, round(mots / 200))
 
 
+def _maj(texte):
+    """Un titre de blog : première lettre en capitale, et les sigles écrits correctement."""
+    texte = (texte or "").strip()
+    if not texte:
+        return texte
+    texte = texte.replace("vpn", "VPN") if "vpn" in texte else texte
+    return texte[:1].upper() + texte[1:]
+
+
 def _date_fr(texte):
     """« 12 octobre 2026 » à partir de ce que le site stocke déjà."""
     return (texte or "").strip() or "—"
@@ -281,7 +290,7 @@ def _page(titre, contenu, actif, titre_onglet=None, description=None):
 <style>{STYLE}</style></head><body>
 <header class="site"><div class="wrap">
 <a class="marque" href="/">Guide<span>VPN</span></a>
-<nav><a href="/">Les guides</a><a href="/sitemap.xml">Plan</a></nav>
+<nav><a href="/">Les guides</a></nav>
 </div></header>
 <main class="wrap">{contenu}</main>
 <footer class="pied"><div class="wrap">
@@ -308,7 +317,7 @@ def page_guides():
         f'<div class="visuel"><img src="{_image(slug_une)}" alt="{html.escape(a_une["h1"])}" '
         f'loading="eager" width="1200" height="675"></div>'
         f'<span class="etiquette">À la une</span>'
-        f'<h2>{html.escape(a_une["titre_onglet"])}</h2>'
+        f'<h2>{html.escape(_maj(a_une["titre_onglet"]))}</h2>'
         f'<p>{html.escape(a_une["description"])}</p>'
         f'<p class="meta"><b>José Ledanite</b> · {html.escape(_date_fr(a_une["publie_le"]))} · '
         f'{_temps_lecture(a_une["corps"])} min de lecture</p>'
@@ -319,7 +328,7 @@ def page_guides():
             f'<a class="carte" href="/guides/{slug}/">'
             f'<div class="vignette"><img src="{_image(slug)}" alt="" loading="lazy" '
             f'width="264" height="192"></div>'
-            f'<div><h3>{html.escape(a["titre_onglet"])}</h3>'
+            f'<div><h3>{html.escape(_maj(a["titre_onglet"]))}</h3>'
             f'<p>{html.escape(a["description"])}</p>'
             f'<span class="meta">{html.escape(_date_fr(a["publie_le"]))} · '
             f'{_temps_lecture(a["corps"])} min</span></div></a>'
@@ -348,13 +357,13 @@ def page_article(slug):
     suite = "".join(
         f'<a class="carte" href="/guides/{s}/"><div class="vignette">'
         f'<img src="{_image(s)}" alt="" loading="lazy" width="264" height="192"></div>'
-        f'<div><h3>{html.escape(x["titre_onglet"])}</h3>'
+        f'<div><h3>{html.escape(_maj(x["titre_onglet"]))}</h3>'
         f'<span class="meta">{_temps_lecture(x["corps"])} min de lecture</span></div></a>'
         for s, x in autres)
     corps = (
         f'<div class="article">'
         f'<p class="fil"><a href="/">Les guides</a> › {html.escape(titre)}</p>'
-        f'<h1>{html.escape(a["h1"])}</h1>'
+        f'<h1>{html.escape(_maj(a["h1"]))}</h1>'
         f'<p class="chapeau">{html.escape(a["chapeau"])}</p>'
         f'<div class="entete-meta"><img src="/img/auteur.jpg" alt="José Ledanite" width="34" height="34">'
         f'<span><b>José Ledanite</b> · {html.escape(_date_fr(a["publie_le"]))} · '
