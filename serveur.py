@@ -290,7 +290,7 @@ def _page(titre, contenu, actif, titre_onglet=None, description=None):
 <style>{STYLE}</style></head><body>
 <header class="site"><div class="wrap">
 <a class="marque" href="/">Guide<span>VPN</span></a>
-<nav><a href="/">Les guides</a></nav>
+<nav><a href="/guides/">Les guides</a></nav>
 </div></header>
 <main class="wrap">{contenu}</main>
 <footer class="pied"><div class="wrap">
@@ -338,6 +338,30 @@ def page_guides():
     return _page("Guides", corps, "guides", titre_onglet="Guide VPN — comparatifs et guides",
                  description="Des guides VPN honnêtes pour Android, TV et streaming : ce qui marche, "
                              "ce qui ne marche pas, et combien ça coûte vraiment.")
+
+
+def page_tous_guides():
+    """L'archive : TOUS les guides, y compris celui de la une. C'est la page que le menu ouvre —
+    sans elle, « Les guides » renvoyait vers l'accueil et le clic ne produisait rien de visible."""
+    entrees = list(reversed(list(articles.ARTICLES.items())))
+    if not entrees:
+        corps = '<div class="article"><h1>Tous les guides</h1><p class="chapeau">Rien encore.</p></div>'
+        return _page("Tous les guides", corps, "guides")
+    cartes = "".join(
+        f'<a class="carte" href="/guides/{slug}/">'
+        f'<div class="vignette"><img src="{_image(slug)}" alt="" loading="lazy" width="264" height="192"></div>'
+        f'<div><h3>{html.escape(_maj(a["titre_onglet"]))}</h3>'
+        f'<p>{html.escape(a["description"])}</p>'
+        f'<span class="meta">{html.escape(_date_fr(a["publie_le"]))} · {_temps_lecture(a["corps"])} min</span></div></a>'
+        for slug, a in entrees)
+    corps = (f'<div class="article" style="margin-top:26px"><h1>Tous les guides</h1>'
+             f'<p class="chapeau">{len(entrees)} guides : ce qui marche vraiment, ce qui ne marche pas, '
+             f'et combien ça coûte.</p></div>'
+             f'<div class="liste">{cartes}</div>')
+    return _page("Tous les guides", corps, "guides",
+                 titre_onglet="Tous les guides VPN — Guide VPN",
+                 description="La liste complète des guides VPN : installation, streaming, sport en ligne, "
+                             "prix réels et pièges à éviter.")
 
 
 def page_article(slug):
@@ -470,7 +494,7 @@ def fabriquer_serveur(port=8080):
             # de pari foot ». Sans ces pages, il n'y a rien à référencer : une application sans
             # texte ne se classe pas sur Google.
             if chemin == "/guides":
-                self._envoyer(page_guides(), "text/html; charset=utf-8")
+                self._envoyer(page_tous_guides(), "text/html; charset=utf-8")
                 return
             if chemin.startswith("/guides/"):
                 page = page_article(chemin[len("/guides/"):].strip("/"))
