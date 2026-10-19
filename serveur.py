@@ -234,13 +234,11 @@ def _page(titre, contenu, actif, titre_onglet=None, description=None):
         fabrique = quand.astimezone().strftime("le %d/%m à %H:%M")
     except (ValueError, TypeError):
         fabrique = ""
-    onglets = (f'<a class="{"actif" if actif == "jour" else ""}" href="/">Aujourd\'hui</a>'
-               f'<a class="{"actif" if actif == "montante" else ""}" href="/montante">La montante</a>'
-               f'<a class="{"actif" if actif == "guides" else ""}" href="/guides">Guides</a>')
+    onglets = (f'<a class="{"actif" if actif == "guides" else ""}" href="/">Guides</a>')
     # ⚠️ UNE SEULE BALISE <title> PAR PAGE, ET ELLE EST PROPRE (règle SEO : 40 à 60 caractères).
     # Avant, les guides auraient hérité du titre de l'application — un même titre sur toutes les
     # pages, ce que Google traite comme du contenu dupliqué.
-    titre_final = titre_onglet or "Guide VPN — les pronostics de José Ledanite"
+    titre_final = titre_onglet or "Guide VPN — comparatifs et guides VPN Android et TV"
     balise_desc = (f'\n<meta name="description" content="{html.escape(description)}">'
                    if description else "")
     # ⚠️ UN SEUL H1 PAR PAGE (règle SEO). Le nom du site est donc un H1 sur l'application, mais un
@@ -328,7 +326,7 @@ def sitemap():
     """LA CARTE DU SITE — indispensable : sans elle, Google met des semaines à trouver les guides.
     Le domaine est celui du déploiement ; si José change d'adresse, cette ligne suit."""
     base = os.environ.get("URL_PUBLIQUE", "https://guide-vpn.onrender.com").rstrip("/")
-    pages = ["/", "/montante", "/guides"] + [f"/guides/{s}" for s in articles.ARTICLES]
+    pages = ["/", "/guides"] + [f"/guides/{s}" for s in articles.ARTICLES]
     urls = "".join(f"<url><loc>{base}{p}</loc></url>" for p in pages)
     return ('<?xml version="1.0" encoding="UTF-8"?>'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>")
@@ -343,7 +341,7 @@ MANIFESTE = """{
  "name": "Guide VPN", "short_name": "Guide VPN", "lang": "fr",
  "start_url": "/", "scope": "/", "display": "standalone",
  "background_color": "#f7f9fc", "theme_color": "#f7f9fc",
- "description": "Les pronostics football de José Ledanite. Par José Ledanite.",
+ "description": "Comparatifs et guides VPN pour Android, TV et streaming — par José Ledanite.",
  "icons": [
   {"src": "/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
   {"src": "/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
@@ -405,7 +403,7 @@ def fabriquer_serveur(port=8080):
             # et un diagnostic public qui va chercher des pages est exactement ce qu'on ne garde pas.
 
             if chemin in ("/", "/index.html"):
-                self._envoyer(page_jour(), "text/html; charset=utf-8")
+                self._envoyer(page_guides(), "text/html; charset=utf-8")
                 return
             if chemin == "/montante":
                 self._envoyer(page_montante(), "text/html; charset=utf-8")
