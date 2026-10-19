@@ -281,6 +281,7 @@ def _page(titre, contenu, actif, titre_onglet=None, description=None):
                    if description else "")
     return f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="google-site-verification" content="_xgT2NROIIzNXS7Iw1Mv0V15aetbsBWr-EBJqHR9nus">
 <title>{titre_final}</title>{balise_desc}
 <link rel="manifest" href="/manifeste.json">
 <meta name="theme-color" content="#fffdf8">
