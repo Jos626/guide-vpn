@@ -303,12 +303,18 @@ def _temps_lecture(corps):
     return max(3, round(mots / 200))
 
 
+MARQUES = [("nordvpn", "NordVPN"), ("cyberghost", "CyberGhost"),
+           ("expressvpn", "ExpressVPN"), ("surfshark", "Surfshark")]
+
+
 def _maj(texte):
     """Un titre de blog : première lettre en capitale, et les sigles écrits correctement."""
     texte = (texte or "").strip()
     if not texte:
         return texte
     texte = re.sub(r"\bvpn\b", "VPN", texte, flags=re.IGNORECASE)
+    for fautif, juste in MARQUES:
+        texte = re.sub(r"\b" + fautif + r"\b", juste, texte, flags=re.IGNORECASE)
     return texte[:1].upper() + texte[1:]
 
 
