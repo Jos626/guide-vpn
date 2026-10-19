@@ -248,6 +248,15 @@ def _base():
     return os.environ.get("URL_PUBLIQUE", "https://jos626.github.io").rstrip("/")
 
 
+def _compteur():
+    """Le script de mesure des visites (GoatCounter), s'il est configuré. Sinon : rien."""
+    code = os.environ.get("GOATCOUNTER_CODE", "").strip()
+    if not code:
+        return ""
+    return (f'\n<script data-goatcounter="https://{code}.goatcounter.com/count" '
+            f'async src="//gc.zgo.at/count.js"></script>')
+
+
 def _image(slug, variante=0):
     """Une illustration stable pour un article : le même slug rend toujours la même image."""
     n = (sum(ord(c) for c in (slug or "")) + variante) % 5 + 1
@@ -298,6 +307,7 @@ def _page(titre, contenu, actif, titre_onglet=None, description=None):
 <p><b>Guide VPN</b> — des comparatifs honnêtes : ce qui marche, ce qui ne marche pas, et pourquoi.</p>
 <p>Écrit par José Ledanite · <a href="/sitemap.xml">Plan du site</a></p>
 </div></footer>
+{_compteur()}
 </body></html>"""
 
 
