@@ -53,7 +53,7 @@ def main(domaine):
     environ = dict(os.environ, PORT=str(port))
     serveur = subprocess.Popen([sys.executable, "-u", os.path.join(ICI, "serveur.py")],
                                cwd=ICI, env=environ,
-                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                               stdout=open("/tmp/export-serveur.log","w"), stderr=subprocess.STDOUT)
     try:
         for _ in range(40):
             try:
@@ -80,7 +80,7 @@ def main(domaine):
                         with open(os.path.join(dossier_articles, f), encoding="utf-8") as fh:
                             articles.append(json.load(fh).get("slug"))
 
-        pages = [("", "index.html"), ("/guides", "guides/index.html"), ("/montante", "montante/index.html")]
+        pages = [("", "index.html"), ("/guides", "guides/index.html")]
         for slug in articles:
             if slug:
                 pages.append((f"/guides/{slug}", f"guides/{slug}/index.html"))
@@ -99,6 +99,11 @@ def main(domaine):
         for f in os.listdir(ICI):
             if f.startswith("icone-") and f.endswith(".png"):
                 shutil.copy(os.path.join(ICI, f), os.path.join(SORTIE, f))
+
+        # les illustrations des articles (téléchargées une fois, servies par le site)
+        dossier_img = os.path.join(ICI, "img")
+        if os.path.isdir(dossier_img):
+            shutil.copytree(dossier_img, os.path.join(SORTIE, "img"))
     finally:
         serveur.terminate()
         try:

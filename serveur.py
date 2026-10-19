@@ -18,6 +18,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -27,83 +28,104 @@ import trafic    # le compteur de visites (sobre : sans cookie, sans adresse IP)
 ICI = os.path.dirname(os.path.abspath(__file__))
 LECTURE_VERTE, LECTURE_VERTE_FORTE = "#16a34a", "#15803d"
 
-STYLE = """
- :root{color-scheme:light}
- *{box-sizing:border-box}
- body{margin:0;background:
-      radial-gradient(900px 400px at 50% -10%,#e6f6ee 0%,rgba(230,246,238,0) 60%),
-      linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
-      color:#0f172a;min-height:100vh;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-      padding:22px 16px 46px}
- .page{max-width:640px;margin:0 auto}
- .tete{display:flex;align-items:center;gap:13px;margin:0 0 18px}
- .tete img{width:52px;height:52px;border-radius:14px;box-shadow:0 8px 18px -10px rgba(11,61,46,.8)}
- .tete h1{font-size:22px;margin:0;letter-spacing:-.4px}
- .tete p{margin:2px 0 0;color:#64748b;font-size:12.5px}
- .onglets{display:flex;gap:8px;margin:0 0 18px}
- .onglets a{flex:1;text-align:center;text-decoration:none;color:#475569;font-weight:600;font-size:14px;
-            padding:11px 8px;border-radius:12px;background:#fff;border:1px solid #e8edf4}
- .onglets a.actif{background:#0b3d2e;color:#fff;border-color:#0b3d2e}
- .frais{display:flex;align-items:center;gap:8px;color:#166534;background:#e8f8ee;border-radius:12px;
-        padding:10px 13px;font-size:13px;margin:0 0 16px}
- h2{font-size:15px;margin:22px 0 10px;color:#475569;text-transform:uppercase;letter-spacing:.6px}
- .match{background:#fff;border:1px solid #e8edf4;border-radius:18px;padding:16px 16px 12px;margin:0 0 12px;
-        box-shadow:0 1px 2px rgba(15,23,42,.03),0 14px 30px -20px rgba(15,23,42,.22)}
- .match h3{margin:0 0 12px;font-size:16px;letter-spacing:-.2px}
- .pari{display:flex;align-items:center;gap:11px;padding:7px 0}
- .pari .nom{flex:1;font-size:14.5px;color:#334155}
- .pari .barre{height:6px;border-radius:99px;background:#eef2f7;overflow:hidden;flex:0 0 74px}
- .pari .barre i{display:block;height:100%;background:#22c55e}
- .pari .pc{font-weight:700;font-size:15px;color:#15803d;min-width:52px;text-align:right}
- .pari .pas{font-size:13px;min-width:26px;text-align:center}
- .plaisir{color:#8896a8;font-size:12.5px;margin:10px 0 0;line-height:1.6}
- .message{background:#fff;border:1px solid #e8edf4;border-radius:18px;padding:18px 16px;margin:0 0 14px;
-          box-shadow:0 1px 2px rgba(15,23,42,.03),0 14px 30px -20px rgba(15,23,42,.22);
-          white-space:pre-wrap;word-break:break-word;font-size:15px;line-height:1.62;color:#1e293b}
- .message b{color:#0f172a}
- .message .quand2{margin:14px 0 0;color:#475569;font-size:14px;font-weight:600}
- .message .trait{color:#dfe5ef;letter-spacing:-1px}
- .mont{background:#fff;border:1px solid #e8edf4;border-radius:18px;padding:16px;margin:0 0 12px;
-       box-shadow:0 14px 30px -20px rgba(15,23,42,.22)}
- .mont .haut{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
- .mont h3{margin:0;font-size:16px;flex:1}
- .mont .cote{font-weight:800;font-size:20px;color:#15803d}
- .mont .quoi{color:#475569;font-size:14px;margin:0 0 8px}
- .mont .quand{color:#8896a8;font-size:12.5px;margin:0}
- .badge{display:inline-block;background:#e8f8ee;color:#166534;font-size:11.5px;font-weight:700;
-        padding:3px 9px;border-radius:99px;margin:0 0 8px}
- .pied{color:#94a3b8;font-size:12px;text-align:center;margin:26px 0 0;line-height:1.7}
- .signature{color:#94a3b8;font-size:12.5px;text-align:center;margin:14px 0 0}
- .signature b{color:#64748b;font-weight:600}
- /* ── LES GUIDES (José, 10/10/2026) ─────────────────────────────────────────────────────────────
-    C'est ici que vit le CONTENU qui se référence. L'application (analyses, montante) est un outil ;
-    un outil ne se classe pas sur Google. Un article, oui — à condition qu'il soit lisible :
-    paragraphes courts, titres clairs, et un lien d'affiliation qui arrive là où il répond au
-    problème, jamais avant. */
- .nom-site{font-size:22px;font-weight:700;margin:0;letter-spacing:-.4px}
- .article{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px 18px;
-          box-shadow:0 10px 30px -22px rgba(15,23,42,.35)}
- .article h1{font-size:23px;line-height:1.3;margin:0 0 10px;letter-spacing:-.4px}
- .article h2{font-size:18.5px;margin:26px 0 8px;letter-spacing:-.2px;
-             border-top:1px solid #eef2f8;padding-top:18px}
- .article h2:first-of-type{border-top:0;padding-top:0}
- .article h3{font-size:15.5px;margin:18px 0 6px;color:#15803d}
- .article p{margin:0 0 12px;line-height:1.72;font-size:14.5px}
- .article li{margin:0 0 8px;line-height:1.68;font-size:14.5px}
- .article ul,.article ol{margin:0 0 12px;padding-left:20px}
- .article .chapeau{font-size:15.5px;color:#334155;line-height:1.7}
- .divulgation{background:#f1f5f9;border-left:3px solid #94a3b8;border-radius:0 10px 10px 0;
-              padding:11px 13px;font-size:13px;color:#475569;line-height:1.6;margin:0 0 16px}
- .lien-affilie{color:#15803d;font-weight:600;text-decoration:underline;text-underline-offset:2px}
- .bouton-affilie{display:inline-block;background:#16a34a;color:#fff!important;padding:13px 22px;
-                 border-radius:12px;font-weight:700;text-decoration:none;letter-spacing:.2px;
-                 box-shadow:0 10px 24px -12px rgba(22,163,74,.85)}
- .guide-carte{display:block;background:#fff;border:1px solid #e2e8f0;border-radius:14px;
-              padding:15px 16px;margin:0 0 12px;text-decoration:none;color:#0f172a}
- .guide-carte b{display:block;font-size:15.5px;margin-bottom:5px}
- .guide-carte span{font-size:13px;color:#64748b;line-height:1.55}
- .vide{background:#fff;border:1px dashed #d7dee9;border-radius:18px;padding:26px;text-align:center;
-       color:#8896a8;font-size:14px}
+STYLE = """:root{
+  --ink:#161513; --muted:#6d6a63; --line:#e7e1d5; --bg:#fffdf8; --card:#ffffff;
+  --accent:#d9a900; --accent-soft:#fff4cc;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:17px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+img{max-width:100%;display:block}
+a{color:var(--ink)}
+.wrap{max-width:748px;margin:0 auto;padding:0 20px}
+
+/* ── en-tête ───────────────────────────────────────────── */
+header.site{position:sticky;top:0;z-index:10;background:rgba(255,253,248,.92);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+.marque{font-family:Georgia,"Times New Roman",serif;font-size:22px;font-weight:700;
+  letter-spacing:-.02em;text-decoration:none}
+.marque span{color:var(--muted);font-weight:400}
+header.site nav a{color:var(--muted);text-decoration:none;font-size:14px;margin-left:20px}
+header.site nav a:hover{color:var(--ink)}
+
+/* ── une du blog ───────────────────────────────────────── */
+.une{display:block;text-decoration:none;margin:34px 0 10px}
+.une .visuel{position:relative;border-radius:14px;overflow:hidden;background:#efe9dc;aspect-ratio:16/9}
+.une .visuel img{width:100%;height:100%;object-fit:cover}
+.etiquette{display:inline-block;background:var(--accent-soft);color:#6b5200;font-size:12px;
+  font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px}
+.une h2{font-family:Georgia,"Times New Roman",serif;font-size:clamp(26px,6vw,38px);line-height:1.15;
+  letter-spacing:-.02em;margin:14px 0 8px}
+.une p{color:var(--muted);margin:0 0 10px}
+.meta{font-size:13.5px;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+
+/* ── liste des articles ────────────────────────────────── */
+.titre-section{display:flex;align-items:center;gap:14px;margin:42px 0 6px}
+.titre-section h2{font-family:Georgia,serif;font-size:15px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);font-weight:700;margin:0;white-space:nowrap}
+.titre-section i{flex:1;height:1px;background:var(--line)}
+.liste{display:flex;flex-direction:column}
+.carte{display:flex;gap:18px;padding:22px 0;border-bottom:1px solid var(--line);text-decoration:none}
+.carte:last-child{border-bottom:0}
+.carte .vignette{flex:0 0 132px;height:96px;border-radius:10px;overflow:hidden;background:#efe9dc}
+.carte .vignette img{width:100%;height:100%;object-fit:cover}
+.carte h3{font-family:Georgia,serif;font-size:19px;line-height:1.25;margin:0 0 6px;letter-spacing:-.01em}
+.carte p{color:var(--muted);font-size:14.5px;margin:0 0 8px;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.carte:hover h3{text-decoration:underline;text-underline-offset:3px}
+
+/* ── article ───────────────────────────────────────────── */
+.fil{font-size:13px;color:var(--muted);margin:22px 0 0}
+.fil a{color:var(--muted);text-decoration:none}
+.article h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(29px,7vw,44px);
+  line-height:1.12;letter-spacing:-.025em;margin:14px 0 12px}
+.article .chapeau{font-size:19.5px;line-height:1.5;color:#3d3a35;margin:0 0 18px}
+.article .entete-meta{display:flex;align-items:center;gap:10px;padding:14px 0;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);margin-bottom:26px}
+.article .entete-meta img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.article .entete-meta span{font-size:13.5px;color:var(--muted)}
+.article .hero{border-radius:14px;overflow:hidden;margin:0 0 30px;background:#efe9dc}
+.article .hero img{width:100%;height:auto}
+.article h2{font-family:Georgia,serif;font-size:26px;line-height:1.25;letter-spacing:-.015em;margin:38px 0 12px}
+.article h3{font-size:19px;margin:26px 0 8px}
+.article p{margin:0 0 18px}
+.article ul,.article ol{margin:0 0 20px;padding-left:22px}
+.article li{margin:0 0 9px}
+.article a.lien-affilie,.article a{color:#8a6b00;text-decoration:underline;text-underline-offset:2px}
+.article .divulgation{background:#f6f2e6;border-left:3px solid var(--accent);padding:14px 16px;
+  font-size:14px;color:#4a463d;border-radius:0 8px 8px 0;margin:0 0 24px}
+.article blockquote{margin:26px 0;padding:4px 0 4px 20px;border-left:3px solid var(--line);
+  font-family:Georgia,serif;font-size:20px;color:#3d3a35}
+.article table{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:15px}
+.article th,.article td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+
+/* ── encart auteur / partage ───────────────────────────── */
+.encart{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:20px;margin:40px 0 26px}
+.encart img{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:0 0 auto}
+.encart b{display:block;font-size:15px}
+.encart p{font-size:14.5px;color:var(--muted);margin:4px 0 0}
+.partage{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:18px 0;border-top:1px solid var(--line)}
+.partage span{font-size:13px;color:var(--muted);margin-right:4px}
+.partage a,.partage button{font-size:13.5px;text-decoration:none;color:var(--ink);border:1px solid var(--line);
+  background:var(--card);padding:8px 13px;border-radius:999px;cursor:pointer;font-family:inherit}
+.partage a:hover,.partage button:hover{border-color:var(--ink)}
+
+/* ── pied ──────────────────────────────────────────────── */
+footer.pied{margin-top:50px;border-top:1px solid var(--line);padding:28px 0 42px;
+  font-size:14px;color:var(--muted)}
+footer.pied .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer.pied a{color:var(--muted)}
+
+@media (max-width:520px){
+  .carte{gap:14px}
+  .carte .vignette{flex-basis:96px;height:80px}
+  .carte h3{font-size:17px}
+  .carte p{display:none}
+}
 """
 
 
@@ -221,112 +243,142 @@ def _carte_montante(v):
             f'<p class="quand">{quand}</p></div>')
 
 
+def _base():
+    """L'adresse publique du site (celle qui sert dans les liens de partage et le sitemap)."""
+    return os.environ.get("URL_PUBLIQUE", "https://jos626.github.io").rstrip("/")
+
+
+def _image(slug, variante=0):
+    """Une illustration stable pour un article : le même slug rend toujours la même image."""
+    n = (sum(ord(c) for c in (slug or "")) + variante) % 5 + 1
+    return f"/img/p{n}.jpg"
+
+
+def _temps_lecture(corps):
+    """Minutes de lecture, arrondies — un repère que les blogs affichent et que les gens aiment."""
+    mots = len(re.sub(r"<[^>]+>", " ", corps or "").split())
+    return max(3, round(mots / 200))
+
+
+def _date_fr(texte):
+    """« 12 octobre 2026 » à partir de ce que le site stocke déjà."""
+    return (texte or "").strip() or "—"
+
+
 def _page(titre, contenu, actif, titre_onglet=None, description=None):
-    """La coquille commune. `titre_onglet` et `description` servent aux GUIDES : c'est le titre de
-    l'onglet et la description que Google lit en premier, et c'est ce qui décide du clic."""
-    p = lire_publication() or {}
-    jour = p.get("jour") or ""
-    # ⚠️ LA DATE ÉTAIT CASSÉE (José l'a vue : « chiffres du (10/10à 01:27) »). Un bricolage de
-    # découpage de chaîne produisait une parenthèse et un « à » collés. On lit la date pour de bon.
-    fabrique = ""
-    try:
-        quand = datetime.fromisoformat(p.get("fabrique_le") or "")
-        fabrique = quand.astimezone().strftime("le %d/%m à %H:%M")
-    except (ValueError, TypeError):
-        fabrique = ""
-    onglets = (f'<a class="{"actif" if actif == "guides" else ""}" href="/">Guides</a>')
-    # ⚠️ UNE SEULE BALISE <title> PAR PAGE, ET ELLE EST PROPRE (règle SEO : 40 à 60 caractères).
-    # Avant, les guides auraient hérité du titre de l'application — un même titre sur toutes les
-    # pages, ce que Google traite comme du contenu dupliqué.
-    titre_final = titre_onglet or "Guide VPN — comparatifs et guides VPN Android et TV"
+    """La coquille du blog : en-tête collant, contenu, pied. Une seule balise <title> par page."""
+    titre_final = titre_onglet or "Guide VPN — comparatifs et guides pour Android, TV et streaming"
     balise_desc = (f'\n<meta name="description" content="{html.escape(description)}">'
                    if description else "")
-    # ⚠️ UN SEUL H1 PAR PAGE (règle SEO). Le nom du site est donc un H1 sur l'application, mais un
-    # simple texte sur les guides : là, le H1 doit être le TITRE DE L'ARTICLE. Deux H1 sur une page
-    # brouillent le sujet aux yeux de Google.
-    nom_site = ("<h1>Guide VPN</h1>" if actif != "guides"
-                else '<p class="nom-site">Guide VPN</p>')
     return f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="google-site-verification" content="qNKo4HtNvkss5ya1qdbGFi6Jd_kZbz2R5GQDh3QVJEg">
-<meta name="mitgo-verification" content="9372d53c-9cce-4b9f-bf7c-4fa1c6420920">
 <title>{titre_final}</title>{balise_desc}
 <link rel="manifest" href="/manifeste.json">
-<meta name="theme-color" content="#f7f9fc">
+<meta name="theme-color" content="#fffdf8">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="/icone-apple-180.png">
 <link rel="icon" type="image/png" href="/icone-192.png">
-<style>{STYLE}</style></head><body><div class="page">
-<div class="tete"><img src="/icone-192.png" alt="Guide VPN" width="52" height="52">
-<div>{nom_site}<p>{html.escape(jour) if not fabrique else "chiffres " + html.escape(fabrique)}</p></div></div>
-<div class="onglets">{onglets}</div>
-{contenu}
-<p class="pied">Pour l\'installer : menu ⋮ de ton navigateur → « Ajouter à l\'écran d\'accueil ».</p>
-<p class="signature">Guide VPN — par <b>José Ledanite</b></p>
-</div></body></html>"""
-
-
-def page_jour():
-    p = lire_publication() or {}
-    matchs = p.get("matchs") or []
-    if not matchs:
-        corps = ('<div class="vide">Aucune analyse publiée pour le moment.<br>'
-                 'Reviens un peu plus tard dans la journée.</div>')
-    else:
-        corps = "".join(_carte_message(m) for m in matchs)
-    return _page("Aujourd'hui", corps, "jour")
-
-
-def page_montante():
-    p = lire_publication() or {}
-    pool = (p.get("montante") or {}).get("pool") or []
-    if not pool:
-        corps = ('<div class="vide">Le vivier de la montante n\'est pas encore publié.<br>'
-                 'Il arrive d\'habitude la veille au soir.</div>')
-    else:
-        corps = ('<h2>Le vivier du jour</h2>'
-                 '<p class="plaisir" style="margin:0 0 12px">Les matchs retenus pour la montante. '
-                 'La cote affichée est celle du pari conseillé.</p>'
-                 + "".join(_carte_montante(v) for v in pool))
-    return _page("La montante", corps, "montante")
+<style>{STYLE}</style></head><body>
+<header class="site"><div class="wrap">
+<a class="marque" href="/">Guide<span>VPN</span></a>
+<nav><a href="/">Les guides</a><a href="/sitemap.xml">Plan</a></nav>
+</div></header>
+<main class="wrap">{contenu}</main>
+<footer class="pied"><div class="wrap">
+<p><b>Guide VPN</b> — des comparatifs honnêtes : ce qui marche, ce qui ne marche pas, et pourquoi.</p>
+<p>Écrit par José Ledanite · <a href="/sitemap.xml">Plan du site</a></p>
+</div></footer>
+</body></html>"""
 
 
 def page_guides():
-    """La liste des guides. C'est aussi la porte d'entrée du maillage interne : chaque article doit
-    être atteignable en un clic depuis une page que Google visite souvent."""
-    cartes = "".join(
-        f'<a class="guide-carte" href="/guides/{slug}"><b>{html.escape(a["titre_onglet"])}</b>'
-        f'<span>{html.escape(a["description"])}</span></a>'
-        for slug, a in articles.ARTICLES.items())
-    corps = ('<div class="article"><h1>Les guides</h1>'
-             '<p class="chapeau">Des explications concrètes, écrites pour être utiles — pas des '
-             'listes traduites. Je te dis ce qui marche, et surtout ce qui ne marche pas.</p>'
-             + cartes + '</div>')
-    return _page("Guides", corps, "guides",
-                 titre_onglet="Guides — Guide VPN",
-                 description="Des guides honnêtes sur le VPN, le streaming et le football en ligne, "
-                             "écrits pour les joueurs francophones.")
+    """La une du blog : un article mis en avant, puis la liste des derniers guides."""
+    entrees = list(articles.ARTICLES.items())
+    if not entrees:
+        corps = ('<div class="une"><h2>Les guides arrivent</h2>'
+                 '<p>Aucun article publié pour le moment. Reviens dans quelques jours.</p></div>')
+        return _page("Guides", corps, "guides", titre_onglet="Guide VPN — comparatifs et guides",
+                     description="Comparatifs et guides VPN pour Android, TV et streaming.")
+
+    # L'article le plus récent occupe la une ; les autres suivent en liste.
+    slug_une, a_une = entrees[-1]
+    reste = list(reversed(entrees[:-1]))
+    corps = (
+        f'<a class="une" href="/guides/{slug_une}">'
+        f'<div class="visuel"><img src="{_image(slug_une)}" alt="{html.escape(a_une["h1"])}" '
+        f'loading="eager" width="1200" height="675"></div>'
+        f'<span class="etiquette">À la une</span>'
+        f'<h2>{html.escape(a_une["titre_onglet"])}</h2>'
+        f'<p>{html.escape(a_une["description"])}</p>'
+        f'<p class="meta"><b>José Ledanite</b> · {html.escape(_date_fr(a_une["publie_le"]))} · '
+        f'{_temps_lecture(a_une["corps"])} min de lecture</p>'
+        f'</a>'
+    )
+    if reste:
+        cartes = "".join(
+            f'<a class="carte" href="/guides/{slug}/">'
+            f'<div class="vignette"><img src="{_image(slug)}" alt="" loading="lazy" '
+            f'width="264" height="192"></div>'
+            f'<div><h3>{html.escape(a["titre_onglet"])}</h3>'
+            f'<p>{html.escape(a["description"])}</p>'
+            f'<span class="meta">{html.escape(_date_fr(a["publie_le"]))} · '
+            f'{_temps_lecture(a["corps"])} min</span></div></a>'
+            for slug, a in reste)
+        corps += ('<div class="titre-section"><h2>Derniers guides</h2><i></i></div>'
+                  f'<div class="liste">{cartes}</div>')
+    return _page("Guides", corps, "guides", titre_onglet="Guide VPN — comparatifs et guides",
+                 description="Des guides VPN honnêtes pour Android, TV et streaming : ce qui marche, "
+                             "ce qui ne marche pas, et combien ça coûte vraiment.")
 
 
 def page_article(slug):
-    """Un guide, avec SON titre d'onglet et SA description (voir la règle SEO dans _page())."""
+    """Un guide, présenté comme un article de blog : visuel, signature, partage, suite à lire."""
     a = articles.ARTICLES.get(slug)
     if not a:
         return None
-    corps = (f'<div class="article"><h1>{html.escape(a["h1"])}</h1>'
-             f'<p class="chapeau">{html.escape(a["chapeau"])}</p>'
-             f'{a["corps"]}'
-             f'<p class="pied">Publié le {html.escape(a["publie_le"])} · '
-             f'<a href="/guides">Voir les autres guides</a></p></div>')
-    return _page(a["h1"], corps, "guides",
-                 titre_onglet=a["titre_onglet"], description=a["description"])
+    url = f"{_base()}/guides/{slug}/"
+    titre = a["titre_onglet"]
+    partage = (
+        f'<a href="https://wa.me/?text={urllib.parse.quote(titre + " " + url)}" rel="nofollow">WhatsApp</a>'
+        f'<a href="https://www.facebook.com/sharer/sharer.php?u={urllib.parse.quote(url)}" rel="nofollow">Facebook</a>'
+        f'<a href="https://twitter.com/intent/tweet?text={urllib.parse.quote(titre)}&url={urllib.parse.quote(url)}" rel="nofollow">X</a>'
+        f'<button type="button" onclick="navigator.clipboard.writeText(\'{url}\');this.textContent=\'Lien copié\'">Copier le lien</button>'
+    )
+    autres = [(s, x) for s, x in articles.ARTICLES.items() if s != slug][:3]
+    suite = "".join(
+        f'<a class="carte" href="/guides/{s}/"><div class="vignette">'
+        f'<img src="{_image(s)}" alt="" loading="lazy" width="264" height="192"></div>'
+        f'<div><h3>{html.escape(x["titre_onglet"])}</h3>'
+        f'<span class="meta">{_temps_lecture(x["corps"])} min de lecture</span></div></a>'
+        for s, x in autres)
+    corps = (
+        f'<div class="article">'
+        f'<p class="fil"><a href="/">Les guides</a> › {html.escape(titre)}</p>'
+        f'<h1>{html.escape(a["h1"])}</h1>'
+        f'<p class="chapeau">{html.escape(a["chapeau"])}</p>'
+        f'<div class="entete-meta"><img src="/img/auteur.jpg" alt="José Ledanite" width="34" height="34">'
+        f'<span><b>José Ledanite</b> · {html.escape(_date_fr(a["publie_le"]))} · '
+        f'{_temps_lecture(a["corps"])} min de lecture</span></div>'
+        f'<div class="hero"><img src="{_image(slug)}" alt="{html.escape(titre)}" '
+        f'width="1200" height="675"></div>'
+        f'{a["corps"]}'
+        f'<div class="encart"><img src="/img/auteur.jpg" alt="José Ledanite" width="56" height="56">'
+        f'<div><b>Cet article t’a été utile ?</b><p>Je publie un guide par jour sur les VPN, '
+        f'le streaming et le foot en ligne. Le plus simple : garde le site en favori.</p></div></div>'
+        f'<div class="partage"><span>Partager</span>{partage}</div>'
+        f'</div>'
+    )
+    if suite:
+        corps += ('<div class="titre-section"><h2>À lire ensuite</h2><i></i></div>'
+                  f'<div class="liste">{suite}</div>')
+    return _page(a["h1"], corps, "guides", titre_onglet=titre, description=a["description"])
 
 
 def sitemap():
     """LA CARTE DU SITE — indispensable : sans elle, Google met des semaines à trouver les guides.
     Le domaine est celui du déploiement ; si José change d'adresse, cette ligne suit."""
     base = os.environ.get("URL_PUBLIQUE", "https://guide-vpn.onrender.com").rstrip("/")
-    pages = ["/", "/guides"] + [f"/guides/{s}" for s in articles.ARTICLES]
+    pages = ["/", "/guides/"] + [f"/guides/{s}/" for s in articles.ARTICLES]
     urls = "".join(f"<url><loc>{base}{p}</loc></url>" for p in pages)
     return ('<?xml version="1.0" encoding="UTF-8"?>'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + urls + "</urlset>")
@@ -404,9 +456,6 @@ def fabriquer_serveur(port=8080):
 
             if chemin in ("/", "/index.html"):
                 self._envoyer(page_guides(), "text/html; charset=utf-8")
-                return
-            if chemin == "/montante":
-                self._envoyer(page_montante(), "text/html; charset=utf-8")
                 return
             # ── LES GUIDES (le contenu qui se référence). José, 10/10/2026 : « on va passer au SEO
             # de pari foot ». Sans ces pages, il n'y a rien à référencer : une application sans
